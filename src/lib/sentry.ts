@@ -34,17 +34,8 @@ Sentry.init({
 
 declare const FeedbackTool: any;
 
-const User = {
-  username: "Tom",
-  email: "tom@example.com",
-  fullName: "Tom",
-};
-
-Sentry.setUser(User);
-
-if (typeof FeedbackTool !== "undefined") {
-  new FeedbackTool().setupSentry(Sentry).setUser(User).init();
-}
+export const sentryFeedbackTool = new FeedbackTool();
+sentryFeedbackTool.setupSentry(Sentry).init();
 
 export const logger = {
   info: (...args: Parameters<typeof Sentry.logger.info>) => {

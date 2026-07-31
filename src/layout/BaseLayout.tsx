@@ -1,7 +1,9 @@
-import { Suspense } from "react";
+import { Suspense, useEffect, useRef, useState, type MouseEvent } from "react";
 import { Outlet, Link, useLocation } from "react-router";
 import NavigationProgress from "@/components/NavigationProgress";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { useUserStore } from "@/store/user";
+import { sentryFeedbackTool } from "@/lib/sentry";
 
 const navItems = [
   { path: "/", label: "首页" },
@@ -11,6 +13,24 @@ const navItems = [
 
 export default function BaseLayout() {
   const location = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
+
+  function onClose() {
+    setIsOpen(false);
+  }
+
+  const auth = useUserStore((state) => state.auth);
+  const user = useUserStore((state) => state.user);
+
+  useEffect(() => {
+    auth();
+  }, []);
+
+  useEffect(() => {
+    if (user) {
+      sentryFeedbackTool.setUser(user);
+    }
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800">
@@ -34,6 +54,20 @@ export default function BaseLayout() {
               </Link>
             ))}
           </nav>
+          <div className="flex items-center gap-4">
+            {!!user ? (
+              <div className="text-sm font-medium text-gray-500">
+                {user.fullName}
+              </div>
+            ) : (
+              <button
+                onClick={() => setIsOpen(true)}
+                className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              >
+                登录
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
@@ -46,6 +80,84 @@ export default function BaseLayout() {
       <footer className="border-t border-gray-200 py-6 text-center text-sm text-gray-400">
         © 2026 My Blog. All rights reserved.
       </footer>
+      <LoginModal isOpen={isOpen} onClose={onClose} />
+    </div>
+  );
+}
+
+type LoginModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+};
+function LoginModal({ isOpen, onClose }: LoginModalProps) {
+  const login = useUserStore((state) => state.login);
+  const formEl = useRef<HTMLFormElement>(null);
+  function handleSubmit(event: MouseEvent) {
+    event.preventDefault();
+    const formData = new FormData(formEl.current!);
+    const username = formData.get("username") as string;
+    const email = formData.get("email") as string;
+    console.log(username, email);
+    login({ username, email, fullName: username });
+    onClose();
+  }
+
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <div className="bg-opacity-50 fixed inset-0 z-50 flex items-center justify-center bg-black/20">
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 cursor-pointer text-2xl text-gray-500"
+      >
+        X
+      </button>
+      <div className="rounded-md bg-white p-8 shadow-lg">
+        <h2 className="mb-4 text-2xl font-bold">登录</h2>
+        <form ref={formEl}>
+          <div className="mb-4">
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-700"
+            >
+              用户名
+            </label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none"
+              required
+            />
+          </div>
+          <div className="mb-4">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
+              邮箱
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none"
+              required
+            />
+          </div>
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+              onClick={handleSubmit}
+            >
+              登录
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

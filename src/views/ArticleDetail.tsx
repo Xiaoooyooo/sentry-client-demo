@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { Link, useParams } from "react-router";
 import { logger, metrics } from "@/lib/sentry";
 import { articles } from "@/lib/mock";
-import { share } from "@/lib/api/article";
+import { shareArticle } from "@/lib/api/article";
 
 export default function ArticleDetail() {
   const { id } = useParams();

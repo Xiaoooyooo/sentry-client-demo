@@ -23,7 +23,7 @@ export default function ArticleDetail() {
     if (!article) {
       return;
     }
-    await share(article.id);
+    await shareArticle(article.id);
   }
 
   useEffect(() => {

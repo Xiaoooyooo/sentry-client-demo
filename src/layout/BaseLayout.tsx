@@ -21,6 +21,7 @@ export default function BaseLayout() {
 
   const auth = useUserStore((state) => state.auth);
   const user = useUserStore((state) => state.user);
+  const logout = useUserStore((state) => state.logout);
 
   useEffect(() => {
     auth();
@@ -58,6 +59,12 @@ export default function BaseLayout() {
             {!!user ? (
               <div className="text-sm font-medium text-gray-500">
                 {user.fullName}
+                <button
+                  onClick={logout}
+                  className="ml-2 rounded-md bg-red-600 px-2 py-1 text-sm font-medium text-white transition-colors hover:bg-red-700"
+                >
+                  退出
+                </button>
               </div>
             ) : (
               <button

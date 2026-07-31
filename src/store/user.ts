@@ -8,8 +8,9 @@ type User = {
 
 export const useUserStore = createStore<{
   user: User | null;
-  login: (user: User) => void;
   auth: () => void;
+  login: (user: User) => void;
+  logout: () => void;
 }>((set) => ({
   user: null,
   login(user: User) {
@@ -21,5 +22,9 @@ export const useUserStore = createStore<{
     if (user) {
       set({ user: JSON.parse(user) as User });
     }
+  },
+  logout() {
+    set({ user: null });
+    localStorage.removeItem("user");
   },
 }));

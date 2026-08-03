@@ -106,6 +106,12 @@ function LoginModal({ isOpen, onClose }: LoginModalProps) {
     const email = formData.get("email") as string;
     console.log(username, email);
     login({ username, email, fullName: username });
+    const preferences = JSON.parse(
+      localStorage.getItem(`preferences:${username}`)!,
+    ) as { theme?: string };
+    if (preferences.theme) {
+      document.documentElement.dataset.theme = preferences.theme;
+    }
     onClose();
   }
 

@@ -14,8 +14,9 @@ export default function ArticleDetail() {
       return;
     }
     const stats = JSON.parse(localStorage.getItem("article-stats") ?? "{}");
-    const entry = stats[article.id];
+    const entry = stats[article.id] ?? { likes: 0, dislikes: 0 };
     entry[like ? "likes" : "dislikes"] += 1;
+    stats[article.id] = entry;
     localStorage.setItem("article-stats", JSON.stringify(stats));
     toast.success(like ? "点赞" : "点踩");
     metrics.count("article.detail.like", 1, {
@@ -27,9 +28,13 @@ export default function ArticleDetail() {
     if (!article) {
       return;
     }
-    const { shareUrl } = await shareArticle(article.id);
-    await navigator.clipboard.writeText(shareUrl);
-    toast.success("分享链接已复制");
+    try {
+      const { shareUrl } = await shareArticle(article.id);
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("分享链接已复制");
+    } catch {
+      toast.error("分享失败，请稍后再试");
+    }
   }
 
   useEffect(() => {

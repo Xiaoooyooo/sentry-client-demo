@@ -5,7 +5,10 @@ const BaseLayout = lazy(() => import("@/layout/BaseLayout"));
 const Home = lazy(() => import("@/views/Home"));
 const ArticleList = lazy(() => import("@/views/ArticleList"));
 const ArticleDetail = lazy(() => import("@/views/ArticleDetail"));
+const Messages = lazy(() => import("@/views/Messages"));
+const Dashboard = lazy(() => import("@/views/Dashboard"));
 const About = lazy(() => import("@/views/About"));
+const Settings = lazy(() => import("@/views/Settings"));
 const NotFound = lazy(() => import("@/components/NotFound"));
 
 const routes: RouteObject[] = [
@@ -27,8 +30,20 @@ const routes: RouteObject[] = [
         element: <ArticleDetail />,
       },
       {
+        path: "messages",
+        element: <Messages />,
+      },
+      {
+        path: "dashboard",
+        element: <Dashboard />,
+      },
+      {
         path: "about",
         element: <About />,
+      },
+      {
+        path: "settings",
+        element: <Settings />,
       },
       {
         path: "*",

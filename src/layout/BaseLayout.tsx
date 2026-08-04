@@ -8,7 +8,10 @@ import { logger, sentryFeedbackTool } from "@/lib/sentry";
 const navItems = [
   { path: "/", label: "首页" },
   { path: "/articles", label: "文章" },
+  { path: "/messages", label: "留言板" },
+  { path: "/dashboard", label: "看板" },
   { path: "/about", label: "关于" },
+  { path: "/settings", label: "设置" },
 ];
 
 export default function BaseLayout() {
@@ -104,7 +107,7 @@ function LoginModal({ isOpen, onClose }: LoginModalProps) {
     const formData = new FormData(formEl.current!);
     const username = formData.get("username") as string;
     const email = formData.get("email") as string;
-    const emailProvider = email.split("@")[1].toLowerCase();
+    const emailProvider = email.split("@")[1]?.toLowerCase() ?? "unknown";
     login({ username, email, fullName: username });
     logger.info("用户登录", { username, emailProvider });
     onClose();

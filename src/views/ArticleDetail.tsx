@@ -13,12 +13,9 @@ export default function ArticleDetail() {
     if (!article) {
       return;
     }
-    const stats = JSON.parse(localStorage.getItem("article-stats")!) as Record<
-      string,
-      { like: number; dislike: number }
-    >;
-    const counter = stats[article.id];
-    counter[like ? "like" : "dislike"] += 1;
+    const stats = JSON.parse(localStorage.getItem("article-stats") ?? "{}");
+    const entry = stats[article.id];
+    entry[like ? "likes" : "dislikes"] += 1;
     localStorage.setItem("article-stats", JSON.stringify(stats));
     toast.success(like ? "点赞" : "点踩");
     metrics.count("article.detail.like", 1, {
@@ -30,8 +27,9 @@ export default function ArticleDetail() {
     if (!article) {
       return;
     }
-    await shareArticle(article.id);
-    toast.success("分享链接已复制到剪贴板");
+    const { shareUrl } = await shareArticle(article.id);
+    await navigator.clipboard.writeText(shareUrl);
+    toast.success("分享链接已复制");
   }
 
   useEffect(() => {
@@ -41,19 +39,7 @@ export default function ArticleDetail() {
         attributes: { articleId: article.id },
       });
     }
-    const deepReadTimer = setTimeout(() => {
-      if (!article) return;
-      metrics.count("article.detail.deep_read", 1, {
-        attributes: { articleId: article.id },
-      });
-      const history = JSON.parse(
-        localStorage.getItem("read-history")!,
-      ) as number[];
-      history.push(article.id);
-      localStorage.setItem("read-history", JSON.stringify(history));
-    }, 5000);
     return () => {
-      clearTimeout(deepReadTimer);
       logger.info("离开 ArticleDetail 页面");
     };
   }, []);
@@ -68,11 +54,6 @@ export default function ArticleDetail() {
       </div>
     );
   }
-
-  const related = articles.filter(
-    (a) =>
-      a.id !== article.id && a.tags.some((tag) => article.tags.includes(tag)),
-  );
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
@@ -152,16 +133,6 @@ export default function ArticleDetail() {
             );
           })}
         </div>
-
-        <section className="mt-8 border-t border-gray-100 pt-6">
-          <h2 className="mb-3 text-lg font-semibold">相关文章</h2>
-          <Link
-            to={`/articles/${related[0].id}`}
-            className="block rounded-lg bg-gray-50 p-4 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50"
-          >
-            {related[0].title}
-          </Link>
-        </section>
       </article>
     </div>
   );

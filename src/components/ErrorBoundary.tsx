@@ -1,5 +1,4 @@
 import { Component, createRef, type PropsWithChildren } from "react";
-import Sentry from "@/lib/sentry";
 import Container from "./Container";
 
 type ErrorBoundaryState = {
@@ -18,10 +17,6 @@ export default class ErrorBoundary extends Component<
   };
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     __DEV__ && console.log({ error, errorInfo });
-    Sentry.withScope((scope) => {
-      scope.setExtra("componentStack", errorInfo.componentStack);
-      Sentry.captureException(error);
-    });
     this.setState({ error });
   }
   render(): React.ReactNode {

@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation } from "react-router";
 import NavigationProgress from "@/components/NavigationProgress";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { useUserStore } from "@/store/user";
-import { sentryFeedbackTool } from "@/lib/sentry";
+import { logger, sentryFeedbackTool } from "@/lib/sentry";
 
 const navItems = [
   { path: "/", label: "首页" },
@@ -104,14 +104,9 @@ function LoginModal({ isOpen, onClose }: LoginModalProps) {
     const formData = new FormData(formEl.current!);
     const username = formData.get("username") as string;
     const email = formData.get("email") as string;
-    console.log(username, email);
+    const emailProvider = email.split("@")[1].toLowerCase();
     login({ username, email, fullName: username });
-    const preferences = JSON.parse(
-      localStorage.getItem(`preferences:${username}`)!,
-    ) as { theme?: string };
-    if (preferences.theme) {
-      document.documentElement.dataset.theme = preferences.theme;
-    }
+    logger.info("用户登录", { username, emailProvider });
     onClose();
   }
 

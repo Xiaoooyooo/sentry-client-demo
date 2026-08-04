@@ -43,6 +43,16 @@ export const logger = {
   },
 };
 
-export const metrics = Sentry.metrics;
+export const metrics = {
+  count: (...args: Parameters<typeof Sentry.metrics.count>) => {
+    Sentry.metrics.count(...args);
+  },
+  distribution: (...args: Parameters<typeof Sentry.metrics.distribution>) => {
+    Sentry.metrics.distribution(...args);
+  },
+  gauge: (...args: Parameters<typeof Sentry.metrics.gauge>) => {
+    Sentry.metrics.gauge(...args);
+  },
+};
 
 export default Sentry;

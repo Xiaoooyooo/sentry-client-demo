@@ -15,6 +15,6 @@ export async function fetchMessages(): Promise<MessageListResponse> {
   const raw = localStorage.getItem("messages");
   const list: Message[] = raw ? JSON.parse(raw) : [];
   return JSON.parse(
-    JSON.stringify({ code: 0, data: { list } }),
+    JSON.stringify({ code: 0, data: list }),
   ) as MessageListResponse;
 }
